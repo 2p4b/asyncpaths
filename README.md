@@ -1,9 +1,37 @@
 # AsyncPathingFinding(0.0.1)
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
 
-```javascript
 
+# | Quick sample |
+
+```javascript
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
+
+function preload() {
+
+}
+
+function create() {
+ var asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
+ var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any object with x and y properties
+ var PointB = {x:22, y,44};
+ var chain = {
+      Origin: PonitA,
+      Destination: PointB,
+      found: function(path){
+              console.log(path);
+        },
+      notfound: function(){
+              console.log('No path found');
+        }
+    }
+  asyncPath.getPath(chain);
+
+}
 ```
+
+
+
 
 #Plugin Initialization
 ```javascript
@@ -11,6 +39,66 @@ PhaserJS PathFinding plugin with optional use of web worker configuration. Fast 
 asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
 
 ```
+
+#Block Configuration
+
+#
+``` javascript
+Origin: {x:{number}, y:{number}}
+Destination: {x:{number}, y:{number}}
+```
+#
+
+``` javascript
+keepTrack: {boolean} 
+```
+
+#
+The offset is Calculated on tracked blocks and property.
+If tracked property is greater than less than offset then new path is calculated from Origin to detination
+
+``` javascript
+trackBy: {string} 'Origin' OR 'Destination'
+``` 
+
+#
+Forces path Manager to set new Daigonal setting ofr this block
+``` javascript
+Daigonals: {boolean}
+```
+
+#
+Set the debugging for this block
+``` javascript
+debugpath: {boolean} 
+```
+
+
+#
+Set the Algorithm for this block
+``` javascript
+Algorithm: {string} 'Manhattan' OR 'Euclidean'
+```
+
+#
+Forces this block to be solved on the main UI thread even if there is a web worker
+``` javascript
+forcemain: {boolean} 
+```
+
+
+#
+found function is fired each time a path is found
+``` javascript
+found: {Function} 
+```
+
+#
+notfound function is fired each time a path is not found
+``` javascript
+notfound: {Function} 
+```
+
 
 #Plugin Congiurations
 
@@ -42,6 +130,11 @@ Setting up the returned path congiguration default pixel
 asyncPath.xOffset = {string} 'units' OR 'pixel'
 ```
 
+
+Setting up the algorithm to use in pathFinding
+```javascript
+asyncPath.algorithm = {string} 'Manhattan' OR 'Euclidean'
+```
 
 
 Setting up the returned path congiguration (if the returned paths should point to the center of each tile or the edges) default true
@@ -100,8 +193,29 @@ A good choice will be using a web Worker only if you have many too many path
 finding calculation to be done instantly, else setting timers for numeber of calculation to be done in each Phaser Display frame would be much more efficient. The
 ``` newWorker() ``` method returns the webworker instance for each worker so you too can manage
 
+
 ```javascript
 asyncPath.newWorker();
+```
+
+Sets Algorithm for webworker
+```javascript
+asyncPath.webWorkerAlgorithm
+```
+
+Set the use of Daigonals in webWorker
+```javascript
+asyncPath.webWorkerDaigonals
+```
+
+Set the cost of Vertical and Horizontal movement in webWorker
+```javascript
+asyncPath.webWorkerVerHorCost
+```
+
+Set the cost of Daigonal movement in webWorker
+```javascript
+asyncPath.webWorkerDaigonalsCost
 ```
 
 # Note
@@ -119,30 +233,4 @@ The returned webworker instance is managed internaly by the plugin
 
 
 
-# | simple sample |
 
-```javascript
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
-
-function preload() {
-
-}
-
-function create() {
- var asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
- var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any object with x and y properties
- var PointB = {x:22, y,44};
- var chain = {
-      Origin: PonitA,
-      Destination: PointB,
-      found: function(path){
-              console.log(path);
-        },
-      notfound: function(){
-              console.log('No path found');
-        }
-    }
-  asyncPath.getPath(chain);
-
-}
-```

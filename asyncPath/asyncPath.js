@@ -239,7 +239,7 @@ Phaser.Plugin.asyncPath = function (parent) {
      * @default 2
      * @type {Number}
      */
-    this._paths_per_sec = 2;
+    this._paths_per_frame = 2;
 
 
 
@@ -311,12 +311,21 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [Algorithm Sets the Algorithm to used]
+     * [Algorithm Sets the Algorithm to be used]
      * @private
      * @default Manhattan
      * @type {string}
      */
     this.Algorithm = 'Manhattan'; //Euclidean,Manhattan
+
+
+    /**
+     * [Algorithm Sets the Algorithm to be used by webworker]
+     * @private
+     * @default Manhattan
+     * @type {string}
+     */
+    this._webWorkerAlgorithm = 'Manhattan'; //Euclidean,Manhattan
 
 
     /**
@@ -437,6 +446,37 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "getWorkers", {
 
 
 
+
+/**
+ * Set the default Algorithm.
+ * @prop Phaser.Plugin.async.algorithm
+ * @public
+ * @param {string} 
+ */
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "algorithm", {
+    set: function (algorithm) {
+        this.Algorithm = algorithm;
+        this._config.Algorithm = algorithm
+    },
+    enumerable: true,
+    configurable: true
+});
+
+
+
+/**
+ * Set the default Algorithm for webworker.
+ * @prop Phaser.Plugin.async.algorithm
+ * @public
+ * @param {string} 
+ */
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerAlgorithm", {
+    set: function (algorithm) {
+        this._webWorkerAlgorithm = algorithm;
+    },
+    enumerable: true,
+    configurable: true
+});
 
 
 /**
@@ -677,9 +717,9 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "debugColor", {
  * @param {number}
  */
 
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerSec", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerFrame", {
     set: function (numberofPaths) {
-        this._paths_per_sec = numberofPaths;
+        this._paths_per_frame = numberofPaths;
     },
     enumerable: true,
     configurable: true
@@ -912,7 +952,7 @@ Phaser.Plugin.asyncPath.prototype.updatequeue = function(block){
 
 Phaser.Plugin.asyncPath.prototype.update = function(){
     if(this._findQueue.length > 0 && this.game.time.now > this._cycletime){
-        this._cycletime = this.game.time.now + (1000/this._paths_per_sec);
+        this._cycletime = this.game.time.now + (1000/this._paths_per_frame);
         var block, path;
         block = this.pathResolvedCache[this._findQueue.shift()];
         if(block !== undefined){
@@ -1767,7 +1807,8 @@ Phaser.Plugin.asyncPath.prototype.newWorker = function(){
             id: workerID,
             Daigonals: this._webWorkerDaigonals,
             DaigonalCost: this._webWorkerDaigonalsCost,
-            StraightCost: this._webWorkerverhorCost
+            StraightCost: this._webWorkerverhorCost,
+            algorithm: this._webWorkerAlgorithm
             }
 
    var workerUrl = window.URL.createObjectURL(this.worker_file);
@@ -1898,19 +1939,19 @@ Phaser.Plugin.asyncPath.prototype.get_uid= function (format, IDnamespace) {
  ********************************************************************/
 
 Phaser.Plugin.asyncPath.worker_nameSpace_main = "\nasyncWoker = function(data) {\n\
-    this.Algorithm = \"Manhattan\" \n\
+    this.Algorithm = data.algorithm; \n\
     this._grid = data.grid;\n\
     this._tileWidth = data.tileWidth;\n\
     this._tileHeight = data.tileHeight;\n\
-    this._start = {}\n\
-    this._stop = {}\n\
-    this._uid = data.id\n\
-    this._verticalCost = data.StraightCost\n\
-    this._horizontalCost = data.StraightCost\n\
-    this._daigonalCost = data.DaigonalCost\n\
-    this._free_ = true\n\
-    this.Daigonals = data.Daigonals\n\
-    this._Queue = []\n\
+    this._start = {};\n\
+    this._stop = {};\n\
+    this._uid = data.id;\n\
+    this._verticalCost = data.StraightCost;\n\
+    this._horizontalCost = data.StraightCost;\n\
+    this._daigonalCost = data.DaigonalCost;\n\
+    this._free_ = true;\n\
+    this.Daigonals = data.Daigonals;\n\
+    this._Queue = [];\n\
 }";
 
 Phaser.Plugin.asyncPath.worker_CalculatePath = "\nasyncWoker.prototype.CalculatePath = function (NodeGrid) { \n\
