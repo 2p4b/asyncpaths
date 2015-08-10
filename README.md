@@ -20,6 +20,7 @@ function create() {
               console.log(path);
         },
       notfound: function(){
+              console.log('No path found');
         }
     }
   asyncPath.getPath(chain);
