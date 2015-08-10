@@ -846,17 +846,18 @@ Phaser.Plugin.asyncPath.prototype.update = function(){
         this._cycletime = this.game.time.now + (1000/this._paths_per_sec);
         var block, path;
         block = this.pathResolvedCache[this._findQueue.shift()];
-        this.asyncConfig(block);
+        if(block !== undefined){
+            this.asyncConfig(block);
 
-        if(block.keepTrack){
-            this.pathManager(block);            
+            if(block.keepTrack !== undefined && block.keepTrack){
+                this.pathManager(block);            
+            }
+            else{        
+                this.onetimePath(block);
+            }
+            this.resolevedPathManager();
+            this.reset();
         }
-        else{
-            console.log(block);           
-            this.onetimePath(block);
-        }
-        this.resolevedPathManager();
-        this.reset();
     }
 }
 
@@ -881,6 +882,10 @@ Phaser.Plugin.asyncPath.prototype.asyncfire = function(block){
         }
         block.change = false;
     }
+
+    if(block.keepTrack === undefined || block.keepTrack === false){
+        this.removePath(block.path_uid);
+    }
 }
 
 
@@ -895,10 +900,21 @@ Phaser.Plugin.asyncPath.prototype.asyncfire = function(block){
  * @param {block} asynCords
  * @return {void} 
  */
-Phaser.Plugin.asyncPath.prototype.onetimePath = function(uid){
-    var block = this.asyncfire(_this.pathResolvedCache[uid]);
-    block.path = this.findpathTo(block.Origin, block.Destination);
-    this.asyncfire(block);
+Phaser.Plugin.asyncPath.prototype.onetimePath = function(block){
+
+    if((block.forcemain !== undefined && block.forcemain) || !this._webWorker.active ){                
+        block.path = this.findpathTo(block.Origin, block.Destination);
+    }
+    else{
+        var _block = {
+            Origin: {x: block.Origin.x, y: block.Origin.y},
+            Destination: {x:block.Destination.x, y: block.Destination.y},
+            id: block.path_uid           
+        };
+        var worker = this.workerCache[0];
+        worker.postMessage(block);
+    }
+    block.change = true;
 }
 
 
@@ -907,7 +923,7 @@ Phaser.Plugin.asyncPath.prototype.onetimePath = function(uid){
 
 
 Phaser.Plugin.asyncPath.prototype.removePath = function (uid) {
-    delete this.pathResolvedCache[uid]
+    delete this.pathResolvedCache[uid];
 }
 
 
@@ -930,7 +946,7 @@ Phaser.Plugin.asyncPath.prototype.asyncConfig = function(cords){
     var configs = ['Daigonals','Algorithm','debugpath'];
     var _this = this;
     configs.forEach(function(configuraion){
-        if(cords[configuraion] != undefined){
+        if(cords[configuraion] !== undefined){
             _this[configuraion] = cords[configuraion];
         }
     });
@@ -947,51 +963,51 @@ Phaser.Plugin.asyncPath.prototype.asyncConfig = function(cords){
  * @param {cords} asynCords
  * @return {void} 
  */
-Phaser.Plugin.asyncPath.prototype.pathManager = function(cords){
-    var block = {
-            Origin: {x: cords.Origin.x, y: cords.Origin.y},
-            Destination: {x:cords.Destination.x, y: cords.Destination.y},
-            id: cords.path_uid           
+Phaser.Plugin.asyncPath.prototype.pathManager = function(block){
+    var _block = {
+            Origin: {x: block.Origin.x, y: block.Origin.y},
+            Destination: {x:block.Destination.x, y: block.Destination.y},
+            id: block.path_uid           
         }
 
     var worker = this.workerCache[0];
 
-    if(cords.lastx !== undefined && cords.lasty !== undefined){
-        var x_off = cords.x_off || this._X_Offset;
-        var y_off = cords.y_off || this._Y_Offset;
-        var xChanged = (cords.lastx > (cords[cords.trackBy].x + x_off)) || (cords.lastx < (cords[cords.trackBy].x - x_off));
-        var yChanged = (cords.lasty > (cords[cords.trackBy].y + y_off)) || (cords.lasty < (cords[cords.trackBy].y - y_off));
+    if(block.lastx !== undefined && block.lasty !== undefined){
+        var x_off = block.x_off || this._X_Offset;
+        var y_off = block.y_off || this._Y_Offset;
+        var xChanged = (block.lastx > (block[block.trackBy].x + x_off)) || (block.lastx < (block[block.trackBy].x - x_off));
+        var yChanged = (block.lasty > (block[block.trackBy].y + y_off)) || (block.lasty < (block[block.trackBy].y - y_off));
         
                
         if( xChanged || yChanged ){
-                cords.change = true;
-                cords.lastx = cords[cords.trackBy].x;
-                cords.lasty = cords[cords.trackBy].y;
-                if((cords.forcemain !== undefined && cords.forcemain) || !this._webWorker.active ){                
-                    cords.path = this.findpathTo(cords.Origin, cords.Destination);
+                block.change = true;
+                block.lastx = block[block.trackBy].x;
+                block.lasty = block[block.trackBy].y;
+                if((block.forcemain !== undefined && block.forcemain) || !this._webWorker.active ){                
+                    block.path = this.findpathTo(block.Origin, block.Destination);
                 }
                 else{
 
-                    worker.postMessage(block);
+                    worker.postMessage(_block);
                 }
         }       
     }
 
 
     else {
-            cords.lastx = cords[cords.trackBy].x;
-            cords.lasty = cords[cords.trackBy].y;
-            cords.path = [];
-            cords.change = true;
-            if((cords.forcemain !== undefined && cords.forcemain) || !this._webWorker.active ){              
-                cords.path = this.findpathTo(cords.Origin, cords.Destination);
+            block.lastx = block[block.trackBy].x;
+            block.lasty = block[block.trackBy].y;
+            block.path = [];
+            block.change = true;
+            if((block.forcemain !== undefined && block.forcemain) || !this._webWorker.active ){              
+                block.path = this.findpathTo(block.Origin, block.Destination);
             }
             else{
-                worker.postMessage(block);
+                worker.postMessage(_block);
             }
     }
 
-    this.updatequeue(cords.path_uid);
+    this.updatequeue(block.path_uid);
 }
 
 
@@ -1134,6 +1150,9 @@ Phaser.Plugin.asyncPath.prototype.setTeminalNodes = function (NodeGrid) {
 
 
 
+
+
+
 /**
  * Calculate the path.
  * @method Phaser.Plugin.async.CalculatePath
@@ -1195,14 +1214,17 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 Phaser.Plugin.asyncPath.prototype.resolevedPathManager = function (){
     _this = this;
     Object.keys(this.pathResolvedCache).forEach( function (uid){
-        var Path = _this.pathResolvedCache[uid].path;
-        Path = _this.makePoints(Path);
-        _this.asyncfire(_this.pathResolvedCache[uid]);
-        _this.clearVisual();
-        if(_this.debugpath && Path.length>0){
-            _this.debugger(Path);
+        if(_this.pathResolvedCache[uid] !== undefined){
+            var Path = _this.pathResolvedCache[uid].path;
+            if(Path !== undefined){
+                Path = _this.makePoints(Path);
+                _this.asyncfire(_this.pathResolvedCache[uid]);
+                _this.clearVisual();
+                if(_this.debugpath && Path.length>0){
+                    _this.debugger(Path);
+                }
+            }
         }
-        
     });
 }
 
@@ -1332,6 +1354,10 @@ Phaser.Plugin.asyncPath.prototype.makePoints = function (path) {
 
 
 
+
+
+
+
 /**
  * Sort path list heap.
  * @method Phaser.Plugin.ascny.sortHeap
@@ -1352,6 +1378,9 @@ Phaser.Plugin.asyncPath.prototype.sortHeap = function (heap, prop) {
     }
     return heap;
 }
+
+
+
 
 
 
@@ -1385,6 +1414,9 @@ Phaser.Plugin.asyncPath.prototype.sortHeapGroup = function (heap, prop) {
 
     return heap;
 }
+
+
+
 
 
 
@@ -1695,6 +1727,9 @@ Phaser.Plugin.asyncPath.prototype.priotiesFreeWorkers = function(){
 
 
 
+
+
+
 /**
  * [priotiesWorkersQueue]
  * @private
@@ -1715,6 +1750,11 @@ Phaser.Plugin.asyncPath.prototype.priotiesWorkersQueue = function(){
 
 
 
+
+
+
+
+
 /**
  * [pathCacheRegister register new blocks]
  * @param  {Object} block 
@@ -1726,6 +1766,10 @@ Phaser.Plugin.asyncPath.prototype.pathCacheRegister = function(block){
     block.uid = _uid;
     return block
 }
+
+
+
+
 
 
 
