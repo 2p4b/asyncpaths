@@ -1,5 +1,34 @@
-# AsyncPathingFinding
+# AsyncPathingFinding(0.0.1)
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
+
+```javascript
+
+```
+
+# | usagge |
+
+#Plugin Initialization
+```javascript
+
+asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
+
+```
+#Creating a web worker for faster path calculations
+A good choice will be using a web Wokrer only if you have many too many path
+finding calculation to be done instantly else setting timers for numeber of calculation to be done in each Phaser Display fram would be much more efficient.
+```javascript newWorker() ``` return the webworker instance so you too can manage
+
+```javascript
+asyncPath.newWorker();
+```
+
+# Note
+If there are now web workers, all path finding calculations run on the main UI thread.
+The returned webworker instance is managed internaly by the plugin
+
+
+
+
 
 # | simple sample |
 
