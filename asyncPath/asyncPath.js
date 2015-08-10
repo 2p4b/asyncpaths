@@ -239,7 +239,7 @@ Phaser.Plugin.asyncPath = function (parent) {
      * @default 2
      * @type {Number}
      */
-    this._paths_per_sec = 2;
+    this._paths_per_frame = 2;
 
 
 
@@ -677,9 +677,9 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "debugColor", {
  * @param {number}
  */
 
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerSec", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerFrame", {
     set: function (numberofPaths) {
-        this._paths_per_sec = numberofPaths;
+        this._paths_per_frame = numberofPaths;
     },
     enumerable: true,
     configurable: true
@@ -912,7 +912,7 @@ Phaser.Plugin.asyncPath.prototype.updatequeue = function(block){
 
 Phaser.Plugin.asyncPath.prototype.update = function(){
     if(this._findQueue.length > 0 && this.game.time.now > this._cycletime){
-        this._cycletime = this.game.time.now + (1000/this._paths_per_sec);
+        this._cycletime = this.game.time.now + (1000/this._paths_per_frame);
         var block, path;
         block = this.pathResolvedCache[this._findQueue.shift()];
         if(block !== undefined){
