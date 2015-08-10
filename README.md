@@ -1,7 +1,7 @@
 # AsyncPathingFinding
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
 
-#very simple sample
+# | simple sample |
 
 ```javascript
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
@@ -12,7 +12,7 @@ function preload() {
 
 function create() {
  var asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
- var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any obeject with a x and y prop
+ var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any object with x and y properties
  var PointB = {x:22, y,44};
  var chain = {
       Origin: PonitA,
