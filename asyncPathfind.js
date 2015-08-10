@@ -93,6 +93,28 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
+     * [_specific layer]
+     * @type {Boolean}
+     */
+    this._specific = false
+
+
+
+
+
+
+    /**
+     * [_specific_layer_name]
+     * @type {string}
+     */
+    this._specific_layer_name = null
+
+
+
+
+
+
+    /**
      * [_stop blocks destination points]
      * @private
      * @type {asyncPoint}
@@ -137,12 +159,12 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [_avoidLayer]
-     * @default null
+     * [_version_ ]
+     * @type {String}
      * @private
-     * @type {string}
      */
-    this._avoidLayer = null;
+    this._version_ = "0.0.1";
+
 
 
     /**
@@ -382,6 +404,23 @@ Phaser.Plugin.asyncPath.prototype.constructor = Phaser.Plugin.asyncPath;
 
 
 /**
+ * [get description]
+ * @method Phaser.Plugin.asyncPath.version
+ * @return {string}  [Version]
+ */
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "version", {
+    get: function () {
+        return this._version_;
+    },
+    enumerable: false,
+    configurable: false
+});
+
+
+
+
+
+/**
  * returns the number of webWorkers.
  * @prop Phaser.Plugin.async.getbWorkers
  * @public
@@ -548,6 +587,8 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "xOffset", {
 
 
 
+
+
 /**
  * Change in Y-Tracking that would triger a pathfing calculation
  * @prop Phaser.Plugin.async.yOffset
@@ -562,6 +603,8 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "yOffset", {
     enumerable: true,
     configurable: true
 });
+
+
 
 
 
@@ -701,7 +744,15 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "VertHorCost", {
 
 Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "nonWalkableTile", {
     set: function (tile) {
-        this._avoidTile.push(tile);
+        if(tile instanceof Object){
+            for(var i = 0; i < tile.length; i++){
+                this._avoidTile.push(tile[i]);
+            }
+        }
+        else{
+            this._avoidTile.push(tile);
+        }
+        
     },
     enumerable: true,
     configurable: true
@@ -734,6 +785,7 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "useDaigonals", {
  * Sets the layer to be avoided .
  * @prop Phaser.Plugin.async.nonWalkableLayer
  * @public
+ * @param {string} 
  */
 
 Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "nonWalkableLayer", {
@@ -741,15 +793,15 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "nonWalkableLayer", {
         if(this._mapset){         
             for(var i = 0; i < this._map.layers.length; i++){
                 if(this._map.layers[i].name === layer){
-                    this._avoidLayer = this._map.layers[i];
-                    var _nodeGrid = []
-                    for (var y = 0; y < this._avoidLayer.height; y++){
+                    var _avoidLayer = this._map.layers[i];
+                    var _nodeGrid = [];
+                    for (var y = 0; y < _avoidLayer.height; y++){
                         _nodeGrid[y] = [];
-                        for (var x = 0; x < this._avoidLayer.width; x++){
+                        for (var x = 0; x < _avoidLayer.width; x++){
                             var Node = {};
-                            var alreadyIn = this.shouldAvoid(this._avoidLayer.data[y][x].index);
-                            if(this._avoidLayer.data[y][x].index !== -1){
-                                if(!alreadyIn){this._avoidTile.push(this._avoidLayer.data[y][x].index);} 
+                            var alreadyIn = this.shouldAvoid(_avoidLayer.data[y][x].index);
+                            if(_avoidLayer.data[y][x].index !== -1){
+                                if(!alreadyIn){this._avoidTile.push(_avoidLayer.data[y][x].index);} 
                                 Node = this.setasNonWalkable(x,y);
                             }
                             else{
@@ -772,6 +824,23 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "nonWalkableLayer", {
     enumerable: true,
     configurable: true
 });
+
+
+
+
+
+/**
+ * [useSpecific description]
+ * @param  {array} tile_Array
+ * @param  {string} layer_Name
+ * @return {[type]}  
+ */
+Phaser.Plugin.asyncPath.prototype.useSpecific = function (tile_Array, layer_Name){
+    this._specific_layer_name = layer_Name;
+    this.nonWalkableTile = tile_Array;
+    this._specific = true;
+    this.setNodeGrid();
+}
 
 
 
@@ -921,7 +990,13 @@ Phaser.Plugin.asyncPath.prototype.onetimePath = function(block){
 
 
 
-
+/**
+ * [removePath description]
+ * @method Phaser.Plugin.asyncPath.removePath
+ * @private
+ * @param  {string} uid 
+ * @return {void}  
+ */
 Phaser.Plugin.asyncPath.prototype.removePath = function (uid) {
     delete this.pathResolvedCache[uid];
 }
@@ -1089,14 +1164,27 @@ Phaser.Plugin.asyncPath.prototype.findpathTo = function (Origin, Destination) {
  * @return {asyncNodeGrid} asyncNodeGrid
  */
 Phaser.Plugin.asyncPath.prototype.setNodeGrid = function () {
-    var NodeGrid = {};
+    var NodeGrid = [];
 
     if(!this._gridSet){
-        var tile = this._avoidTile[0];
+        var tile;
+        var _avoidLayer;
+        if(this._specific){
+            for(var i = 0; i < this._map.layers.length;  i++){
+                if(this._map.layers[i].name === this._specific_layer_name){
+                    _avoidLayer = this._map.layers[i];
+                    break;
+                }
+            }
+        }
+        else{
+            _avoidLayer = this._map.layers[0];
+        }
         for (var y = 0; y < this._map.height; y++) {
             NodeGrid[y] = [];
             for (var x = 0; x < this._map.width; x++) {
-                var Node = {};           
+                var Node = {};
+                tile = _avoidLayer.data[y][x].index;          
                 var badTile = this.shouldAvoid(tile); 
                 if (badTile) {
                     Node = this.setasNonWalkable(x, y);
@@ -1107,6 +1195,8 @@ Phaser.Plugin.asyncPath.prototype.setNodeGrid = function () {
                 NodeGrid[y].push(Node);
             }
         }
+        this._grid = JSON.stringify(NodeGrid);
+        this._gridSet = true;
     }
     else{
         
@@ -1210,7 +1300,12 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 
 
 
-
+/**
+ * [resolevedPathManager Manages Resolved Paths]
+ * @method Phaser.Plugin.async.resolevedPathManager
+ * @public
+ * @return {void} 
+ */
 Phaser.Plugin.asyncPath.prototype.resolevedPathManager = function (){
     _this = this;
     Object.keys(this.pathResolvedCache).forEach( function (uid){
