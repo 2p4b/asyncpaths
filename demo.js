@@ -29,9 +29,15 @@ function create() {
   
 
   asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
+  /*********creates a new Web Worker to handle path finding;
+  If worker web worker exist then all calculations with be done on that worker
+
+  asyncPath.newWorker(); 
+  **********************/
+
   asyncPath.tileMap = map;
   asyncPath.useSpecific(badTiles,"wall");
-  //asyncPath.nonWalkableLayer = "wall";
+  //asyncPath.nonWalkableLayer = "wall"; //set all tiles on layer as non walk able
 
 
   cursors = game.input.keyboard.createCursorKeys();
@@ -53,6 +59,7 @@ function create() {
 
 
 findpath = function(){
+
 	block = {
 		Origin: car,
 		Destination: game.input,
