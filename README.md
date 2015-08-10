@@ -44,15 +44,15 @@ asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
 
 ``` javascript
 Block = {
-  Origin: {x:{number}, y:{number}}
-  Destination: {x:{number}, y:{number}}
-  keepTrack: {boolean} Optional
-  trackBy: {string} Optional
-  Daigonals: {boolean}  Optional
-  debugpath: {boolean}  Optional
-  Algorithm: {string}   Optional
-  forcemain: {boolean}  Optional
-  found: {Function} Optional
+  Origin: {x:{number}, y:{number}},
+  Destination: {x:{number}, y:{number}},
+  keepTrack: {boolean}, Optional
+  trackBy: {string}, Optional
+  Daigonals: {boolean},  Optional
+  debugpath: {boolean},  Optional
+  Algorithm: {string},  Optional
+  forcemain: {boolean},  Optional
+  found: {Function}, Optional
   notfound: {Function}  Optional
   }
 ```
