@@ -14,8 +14,8 @@ function preload() {
 function create() {
  var asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
  var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any object with x and y properties
- var PointB = {x:22, y,44};
- var chain = {
+ PointB = {x:22, y,44};
+ Block = {
       Origin: PonitA,
       Destination: PointB,
       found: function(path){
@@ -25,7 +25,7 @@ function create() {
               console.log('No path found');
         }
     }
-  asyncPath.getPath(chain);
+  asyncPath.getPath(Block);
 
 }
 ```
@@ -41,6 +41,21 @@ asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
 ```
 
 #Block Configuration
+
+``` javascript
+Block = {
+  Origin: {x:{number}, y:{number}}
+  Destination: {x:{number}, y:{number}}
+  keepTrack: {boolean} Optional
+  trackBy: {string} Optional
+  Daigonals: {boolean}  Optional
+  debugpath: {boolean}  Optional
+  Algorithm: {string}   Optional
+  forcemain: {boolean}  Optional
+  found: {Function} Optional
+  notfound: {Function}  Optional
+  }
+```
 
 #
 ``` javascript
@@ -200,22 +215,22 @@ asyncPath.newWorker();
 
 Sets Algorithm for webworker
 ```javascript
-asyncPath.webWorkerAlgorithm
+asyncPath.webWorkerAlgorithm {string} 'Manhattan' OR 'Euclidean'
 ```
 
 Set the use of Daigonals in webWorker
 ```javascript
-asyncPath.webWorkerDaigonals
+asyncPath.webWorkerDaigonals {boolean} true OR false 
 ```
 
 Set the cost of Vertical and Horizontal movement in webWorker
 ```javascript
-asyncPath.webWorkerVerHorCost
+asyncPath.webWorkerVerHorCost {number}
 ```
 
 Set the cost of Daigonal movement in webWorker
 ```javascript
-asyncPath.webWorkerDaigonalsCost
+asyncPath.webWorkerDaigonalsCost {number}
 ```
 
 # Note
