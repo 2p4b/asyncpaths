@@ -34,7 +34,6 @@
 
 
 
-
 /** 
 * @class Phaser.Plugin.asyncPath
 * @constructor
