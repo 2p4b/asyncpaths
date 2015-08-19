@@ -18,7 +18,7 @@ function create() {
   wall = map.createLayer('wall');
  
 
-  badTiles = [350,351,352,370,230,250,372,270,391,390, 392, 373, 393];
+  badTiles = [350,351,352,370,230,250,372,270,391,390, 392, 373, 374, 393];
 
   map.setCollision(badTiles, true, 'wall', true)//collison tile list far from perfect but plugin reads them just fine
 
