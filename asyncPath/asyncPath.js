@@ -34,6 +34,7 @@
 
 
 
+
 /** 
 * @class Phaser.Plugin.asyncPath
 * @constructor
@@ -238,7 +239,7 @@ Phaser.Plugin.asyncPath = function (parent) {
      * @default 2
      * @type {Number}
      */
-    this._paths_per_frame = 2;
+    this._paths_per_sec = 2;
 
 
 
@@ -310,21 +311,12 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [Algorithm Sets the Algorithm to be used]
+     * [Algorithm Sets the Algorithm to used]
      * @private
      * @default Manhattan
      * @type {string}
      */
     this.Algorithm = 'Manhattan'; //Euclidean,Manhattan
-
-
-    /**
-     * [Algorithm Sets the Algorithm to be used by webworker]
-     * @private
-     * @default Manhattan
-     * @type {string}
-     */
-    this._webWorkerAlgorithm = 'Manhattan'; //Euclidean,Manhattan
 
 
     /**
@@ -445,37 +437,6 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "getWorkers", {
 
 
 
-
-/**
- * Set the default Algorithm.
- * @prop Phaser.Plugin.async.algorithm
- * @public
- * @param {string} 
- */
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "algorithm", {
-    set: function (algorithm) {
-        this.Algorithm = algorithm;
-        this._config.Algorithm = algorithm
-    },
-    enumerable: true,
-    configurable: true
-});
-
-
-
-/**
- * Set the default Algorithm for webworker.
- * @prop Phaser.Plugin.async.algorithm
- * @public
- * @param {string} 
- */
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerAlgorithm", {
-    set: function (algorithm) {
-        this._webWorkerAlgorithm = algorithm;
-    },
-    enumerable: true,
-    configurable: true
-});
 
 
 /**
@@ -716,9 +677,9 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "debugColor", {
  * @param {number}
  */
 
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerFrame", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "pathsPerSec", {
     set: function (numberofPaths) {
-        this._paths_per_frame = numberofPaths;
+        this._paths_per_sec = numberofPaths;
     },
     enumerable: true,
     configurable: true
@@ -951,7 +912,7 @@ Phaser.Plugin.asyncPath.prototype.updatequeue = function(block){
 
 Phaser.Plugin.asyncPath.prototype.update = function(){
     if(this._findQueue.length > 0 && this.game.time.now > this._cycletime){
-        this._cycletime = this.game.time.now + (1000/this._paths_per_frame);
+        this._cycletime = this.game.time.now + (1000/this._paths_per_sec);
         var block, path;
         block = this.pathResolvedCache[this._findQueue.shift()];
         if(block !== undefined){
@@ -964,9 +925,11 @@ Phaser.Plugin.asyncPath.prototype.update = function(){
                 this.onetimePath(block);
             }
             this.resolevedPathManager();
-            this.reset();
+            this.reset(); 
         }
+
     }
+    
 }
 
 
@@ -1016,11 +979,11 @@ Phaser.Plugin.asyncPath.prototype.onetimePath = function(block){
     else{
         var _block = {
             Origin: {x: block.Origin.x, y: block.Origin.y},
-            Destination: {x:block.Destination.x, y: block.Destination.y},
+            Destination: {x: block.Destination.x, y: block.Destination.y},
             id: block.path_uid           
         };
         var worker = this.workerCache[0];
-        worker.postMessage(block);
+        worker.postMessage(_block);
     }
     block.change = true;
 }
@@ -1305,13 +1268,17 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 
         suroundingNodes = this.getSoroundingNodes(listCandidate, NodeGrid);
 
-        this.setNodesCost(listCandidate, suroundingNodes, list, NodeGrid);
+        list = this.setNodesCost(listCandidate, suroundingNodes, list, NodeGrid);
 
         list = this.sortHeap(list,'Fcost');
 
         list = this.sortHeapGroup(list,'Hcost');
 
         listCandidate = list.Open.shift();
+
+        if (listCandidate === undefined) {
+            break;
+        }
 
         if(listCandidate.StopNode){
 
@@ -1321,11 +1288,7 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 
             break;
         }
-
-        if (list.Open.length == 0) {
-            break;
-        }
-    
+   
         
     }
     if (list.Target !== null) {
@@ -1687,11 +1650,19 @@ Phaser.Plugin.asyncPath.prototype.setNodesCost = function (Node, SoroundingNodes
         SoroundingNodes[i].Hcost = tempHcost;
         SoroundingNodes[i].Fcost = tempFcost;       
 
-        if (SoroundingNodes[i].Parent === null || SoroundingNodes[i].Parent.Gcost > Node.Gcost) {
+        if (SoroundingNodes[i].Parent === null) {
             SoroundingNodes[i].Parent = Node;
             list.Open.push(SoroundingNodes[i]);
         }
 
+        else if (SoroundingNodes[i].Parent.Gcost > Node.Gcost){
+            for(var j = 0; j < list.Open.length; j++){
+                if(list.Open[j].X === SoroundingNodes[i].X && list.Open[j].Y === SoroundingNodes[i].Y){
+                    list.Open[j].Parent = Node;
+                    break;
+                }
+            }
+        }
     }
 
     return list;
@@ -1806,8 +1777,7 @@ Phaser.Plugin.asyncPath.prototype.newWorker = function(){
             id: workerID,
             Daigonals: this._webWorkerDaigonals,
             DaigonalCost: this._webWorkerDaigonalsCost,
-            StraightCost: this._webWorkerverhorCost,
-            algorithm: this._webWorkerAlgorithm
+            StraightCost: this._webWorkerverhorCost
             }
 
    var workerUrl = window.URL.createObjectURL(this.worker_file);
@@ -1938,22 +1908,23 @@ Phaser.Plugin.asyncPath.prototype.get_uid= function (format, IDnamespace) {
  ********************************************************************/
 
 Phaser.Plugin.asyncPath.worker_nameSpace_main = "\nasyncWoker = function(data) {\n\
-    this.Algorithm = data.algorithm; \n\
+    this.Algorithm = \"Manhattan\" \n\
     this._grid = data.grid;\n\
     this._tileWidth = data.tileWidth;\n\
     this._tileHeight = data.tileHeight;\n\
-    this._start = {};\n\
-    this._stop = {};\n\
-    this._uid = data.id;\n\
-    this._verticalCost = data.StraightCost;\n\
-    this._horizontalCost = data.StraightCost;\n\
-    this._daigonalCost = data.DaigonalCost;\n\
-    this._free_ = true;\n\
-    this.Daigonals = data.Daigonals;\n\
-    this._Queue = [];\n\
+    this._start = {}\n\
+    this._stop = {}\n\
+    this._uid = data.id\n\
+    this._verticalCost = data.StraightCost\n\
+    this._horizontalCost = data.StraightCost\n\
+    this._daigonalCost = data.DaigonalCost\n\
+    this._free_ = true\n\
+    this.Daigonals = data.Daigonals\n\
+    this._Queue = []\n\
 }";
 
-Phaser.Plugin.asyncPath.worker_CalculatePath = "\nasyncWoker.prototype.CalculatePath = function (NodeGrid) { \n\
+Phaser.Plugin.asyncPath.worker_CalculatePath = "\n\
+\nasyncWoker.prototype.CalculatePath = function (NodeGrid) { \n\
     var list = { Open: [], Target: null, SortType:'Fcost'};\n\
     var listCandidate = NodeGrid[this._start.Y][this._start.X];\n\
     var suroundingNodes;\n\
@@ -1965,20 +1936,20 @@ Phaser.Plugin.asyncPath.worker_CalculatePath = "\nasyncWoker.prototype.Calculate
         list = this.sortHeap(list,'Fcost');\n\
         list = this.sortHeapGroup(list,'Hcost');\n\
         listCandidate = list.Open.shift();\n\
+        if (listCandidate === undefined) {\n\
+            break;\n\
+            }\n\
         if(listCandidate.StopNode){\n\
             pathFound = true;\n\
             list.Target = listCandidate;\n\
             break;\n\
         }\n\
-        if (list.Open.length == 0) {\n\
-            break;\n\
-            }\n\
-        }\n\
-        if (list.Target !== null) {\n\
-            Path = this.pathMap(list, NodeGrid);\n\
-        }\n\
-        return Path;\n\
-    };\n\
+    }\n\
+    if (list.Target !== null) {\n\
+        Path = this.pathMap(list, NodeGrid);\n\
+    }\n\
+    return Path;\n\
+};\n\
 asyncWoker.prototype.pathresolveQueue = function (){\n\
     if(this._Queue.length > 0){\n\
         this._free_ = false;\n\
