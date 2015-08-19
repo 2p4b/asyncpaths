@@ -925,9 +925,11 @@ Phaser.Plugin.asyncPath.prototype.update = function(){
                 this.onetimePath(block);
             }
             this.resolevedPathManager();
-            this.reset();
+            this.reset(); 
         }
+
     }
+    
 }
 
 
@@ -977,11 +979,11 @@ Phaser.Plugin.asyncPath.prototype.onetimePath = function(block){
     else{
         var _block = {
             Origin: {x: block.Origin.x, y: block.Origin.y},
-            Destination: {x:block.Destination.x, y: block.Destination.y},
+            Destination: {x: block.Destination.x, y: block.Destination.y},
             id: block.path_uid           
         };
         var worker = this.workerCache[0];
-        worker.postMessage(block);
+        worker.postMessage(_block);
     }
     block.change = true;
 }
@@ -1266,13 +1268,17 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 
         suroundingNodes = this.getSoroundingNodes(listCandidate, NodeGrid);
 
-        this.setNodesCost(listCandidate, suroundingNodes, list, NodeGrid);
+        list = this.setNodesCost(listCandidate, suroundingNodes, list, NodeGrid);
 
         list = this.sortHeap(list,'Fcost');
 
         list = this.sortHeapGroup(list,'Hcost');
 
         listCandidate = list.Open.shift();
+
+        if (listCandidate === undefined) {
+            break;
+        }
 
         if(listCandidate.StopNode){
 
@@ -1282,11 +1288,7 @@ Phaser.Plugin.asyncPath.prototype.CalculatePath = function (NodeGrid) {
 
             break;
         }
-
-        if (list.Open.length == 0) {
-            break;
-        }
-    
+   
         
     }
     if (list.Target !== null) {
@@ -1648,11 +1650,19 @@ Phaser.Plugin.asyncPath.prototype.setNodesCost = function (Node, SoroundingNodes
         SoroundingNodes[i].Hcost = tempHcost;
         SoroundingNodes[i].Fcost = tempFcost;       
 
-        if (SoroundingNodes[i].Parent === null || SoroundingNodes[i].Parent.Gcost > Node.Gcost) {
+        if (SoroundingNodes[i].Parent === null) {
             SoroundingNodes[i].Parent = Node;
             list.Open.push(SoroundingNodes[i]);
         }
 
+        else if (SoroundingNodes[i].Parent.Gcost > Node.Gcost){
+            for(var j = 0; j < list.Open.length; j++){
+                if(list.Open[j].X === SoroundingNodes[i].X && list.Open[j].Y === SoroundingNodes[i].Y){
+                    list.Open[j].Parent = Node;
+                    break;
+                }
+            }
+        }
     }
 
     return list;
@@ -1913,7 +1923,8 @@ Phaser.Plugin.asyncPath.worker_nameSpace_main = "\nasyncWoker = function(data) {
     this._Queue = []\n\
 }";
 
-Phaser.Plugin.asyncPath.worker_CalculatePath = "\nasyncWoker.prototype.CalculatePath = function (NodeGrid) { \n\
+Phaser.Plugin.asyncPath.worker_CalculatePath = "\n\
+\nasyncWoker.prototype.CalculatePath = function (NodeGrid) { \n\
     var list = { Open: [], Target: null, SortType:'Fcost'};\n\
     var listCandidate = NodeGrid[this._start.Y][this._start.X];\n\
     var suroundingNodes;\n\
@@ -1925,20 +1936,20 @@ Phaser.Plugin.asyncPath.worker_CalculatePath = "\nasyncWoker.prototype.Calculate
         list = this.sortHeap(list,'Fcost');\n\
         list = this.sortHeapGroup(list,'Hcost');\n\
         listCandidate = list.Open.shift();\n\
+        if (listCandidate === undefined) {\n\
+            break;\n\
+            }\n\
         if(listCandidate.StopNode){\n\
             pathFound = true;\n\
             list.Target = listCandidate;\n\
             break;\n\
         }\n\
-        if (list.Open.length == 0) {\n\
-            break;\n\
-            }\n\
-        }\n\
-        if (list.Target !== null) {\n\
-            Path = this.pathMap(list, NodeGrid);\n\
-        }\n\
-        return Path;\n\
-    };\n\
+    }\n\
+    if (list.Target !== null) {\n\
+        Path = this.pathMap(list, NodeGrid);\n\
+    }\n\
+    return Path;\n\
+};\n\
 asyncWoker.prototype.pathresolveQueue = function (){\n\
     if(this._Queue.length > 0){\n\
         this._free_ = false;\n\
