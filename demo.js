@@ -30,8 +30,8 @@ function create() {
 
   asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
   asyncPath.tileMap = map;
-  asyncPath.useSpecific(badTiles,"wall");
-  //asyncPath.nonWalkableLayer = "wall";
+  //asyncPath.useSpecific(badTiles,"wall");
+  asyncPath.nonWalkableLayer = "wall";
 
 
   cursors = game.input.keyboard.createCursorKeys();
