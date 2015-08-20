@@ -198,12 +198,12 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [_daigonalCost daigonal movement cost]
+     * [_DiagonalCost Diagonal movement cost]
      * @default 14
      * @private
      * @type {Number}
      */
-    this._daigonalCost = 14;
+    this._diagonalCost = 14;
 
 
     /**
@@ -272,10 +272,10 @@ Phaser.Plugin.asyncPath = function (parent) {
     /**
      * [_config hold persistent configurations]
      * @private
-     * @default {Algorithm:'Manhattan', debugpath:false, Daigonals:false}
+     * @default {Algorithm:'Manhattan', debugpath:false, Diagonals:false}
      * @type {Object}
      */
-    this._config = {Algorithm:'Manhattan', debugpath:false, Daigonals:false};
+    this._config = {Algorithm:'Manhattan', debugpath:false, Diagonals:false};
 
 
     /**
@@ -302,12 +302,12 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [Daigonals Sets the use of Daigonals]
+     * [Diagonals Sets the use of Diagonals]
      * @private
      * @default false
      * @type {Boolean}
      */
-    this.Daigonals = false;
+    this.Diagonals= false;
 
 
     /**
@@ -365,22 +365,22 @@ Phaser.Plugin.asyncPath = function (parent) {
 
 
     /**
-     * [_webWorkerDaigonals]
+     * [_webWorkerDiagonals]
      * @private
      * @default false
      * @type {Boolean}
      */
-    this._webWorkerDaigonals = false;
+    this._webWorkerDiagonals = false;
 
 
 
     /**
-     * [_webWorkerDaigonalsCost]
+     * [_webWorkerDiagonalsCost]
      * @private
      * @default 14
      * @type {Number}
      */
-    this._webWorkerDaigonalsCost = 14
+    this._webWorkerDiagonalsCost = 14
 
 
 
@@ -475,14 +475,14 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "getWorkerState", {
 
 
 /**
- * [webWorkerDaigonals]
- * @property Phaser.Plugin.asyncPath.webWorkerDaigonals
+ * [webWorkerDiagonals]
+ * @property Phaser.Plugin.asyncPath.webWorkerDiagonals
  * @public
  * @type {Boolean}
  */
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerDaigonals", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerDiagonals", {
     set: function (bool) {
-        this._webWorkerDaigonals = bool;
+        this._webWorkerDiagonals = bool;
     },
     enumerable: true,
     configurable: true
@@ -512,14 +512,14 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerVerHorCost", 
 
 /**
  * Sets the cost of the Horizantal and Veritical Movement.
- * @prop Phaser.Plugin.async.webWorkerDaigonalsCost
+ * @prop Phaser.Plugin.async.webWorkerDiagonalsCost
  * @public
  * @param {number} [movement cost]
  */
 
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerDaigonalsCost", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "webWorkerDiagonalsCost", {
     set: function (cost) {
-        this._webWorkerDaigonalsCost = cost;
+        this._webWorkerDiagonalsCost = cost;
     },
     enumerable: true,
     configurable: true
@@ -763,16 +763,16 @@ Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "nonWalkableTile", {
 
 
 /**
- * Sets the use of Daigonals .
- * @prop Phaser.Plugin.async.useDaigonals
+ * Sets the use of Diagonals .
+ * @prop Phaser.Plugin.async.useDiagonals
  * @public
- * @param {boolean} [Daigonals use]
+ * @param {boolean} [Diagonals use]
  */
 
-Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "useDaigonals", {
+Object.defineProperty(Phaser.Plugin.asyncPath.prototype, "useDiagonals", {
     set: function (bool) {
-        this._config.Daigonals = bool;
-        this.Daigonals = bool;
+        this._config.Diagonals = bool;
+        this.Diagonals= bool;
     },
     enumerable: true,
     configurable: true
@@ -1020,14 +1020,14 @@ Phaser.Plugin.asyncPath.prototype.removePath = function (uid) {
  * @return {void} 
  */
 Phaser.Plugin.asyncPath.prototype.asyncConfig = function(cords){
-    var configs = ['Daigonals','Algorithm','debugpath'];
+    var configs = ['Diagonals','Algorithm','debugpath'];
     var _this = this;
     configs.forEach(function(configuraion){
         if(cords[configuraion] !== undefined){
             _this[configuraion] = cords[configuraion];
         }
     });
-
+    console.log(this.Diagonals)
 }
 
 
@@ -1573,7 +1573,7 @@ Phaser.Plugin.asyncPath.prototype.getSoroundingNodes = function (Node, NodeGrid)
     }
     // else { NodeRight.Tile = NodeGrid[Node.Tile.x + 1][Node.Tile.y] }
     
-    if (this.Daigonals) {
+    if (this.Diagonals) {
 
 
         if (Node.X === 0) {
@@ -1597,25 +1597,25 @@ Phaser.Plugin.asyncPath.prototype.getSoroundingNodes = function (Node, NodeGrid)
 
         if (NodeDownRight && NodeGrid[Node.Y + 1][Node.X + 1].Acceptable && !NodeGrid[Node.Y + 1][Node.X + 1].StartNode) {
             if (NodeGrid[Node.Y + 1][Node.X + 1].Parent === null) {
-                NodeGrid[Node.Y + 1][Node.X + 1].Gcost = Node.Gcost + this._daigonalCost;
+                NodeGrid[Node.Y + 1][Node.X + 1].Gcost = Node.Gcost + this._diagonalCost;
             }
             SoroundingNodes.push(NodeGrid[Node.Y + 1][Node.X + 1]);
         }
         if (NodeDownLeft && NodeGrid[Node.Y + 1][Node.X - 1].Acceptable && !NodeGrid[Node.Y + 1][Node.X - 1].StartNode) {
             if (NodeGrid[Node.Y + 1][Node.X - 1].Parent === null) {
-                NodeGrid[Node.Y + 1][Node.X - 1].Gcost = Node.Gcost + this._daigonalCost;
+                NodeGrid[Node.Y + 1][Node.X - 1].Gcost = Node.Gcost + this._diagonalCost;
             }
             SoroundingNodes.push(NodeGrid[Node.Y + 1][Node.X - 1]);
         }
         if (NodeUpLeft && NodeGrid[Node.Y - 1][Node.X - 1].Acceptable && !NodeGrid[Node.Y - 1][Node.X - 1].StartNode) {
             if (NodeGrid[Node.Y - 1][Node.X - 1].Parent === null) {
-                NodeGrid[Node.Y - 1][Node.X - 1].Gcost = Node.Gcost + this._daigonalCost;
+                NodeGrid[Node.Y - 1][Node.X - 1].Gcost = Node.Gcost + this._diagonalCost;
             }
             SoroundingNodes.push(NodeGrid[Node.Y - 1][Node.X - 1]);
         }
         if (NodeUpRight && NodeGrid[Node.Y - 1][Node.X + 1].Acceptable && !NodeGrid[Node.Y - 1][Node.X + 1].StartNode) {
             if (NodeGrid[Node.Y - 1][Node.X + 1].Parent === null) {
-                NodeGrid[Node.Y - 1][Node.X + 1].Gcost = Node.Gcost + this._daigonalCost;
+                NodeGrid[Node.Y - 1][Node.X + 1].Gcost = Node.Gcost + this._diagonalCost;
             }
             SoroundingNodes.push(NodeGrid[Node.Y - 1][Node.X + 1]);
         }
@@ -1775,8 +1775,8 @@ Phaser.Plugin.asyncPath.prototype.newWorker = function(){
             init: true,
             grid: this._grid,
             id: workerID,
-            Daigonals: this._webWorkerDaigonals,
-            DaigonalCost: this._webWorkerDaigonalsCost,
+            Diagonals: this._webWorkerDiagonals,
+            DiagonalCost: this._webWorkerDiagonalsCost,
             StraightCost: this._webWorkerverhorCost
             }
 
@@ -1917,9 +1917,9 @@ Phaser.Plugin.asyncPath.worker_nameSpace_main = "\nasyncWoker = function(data) {
     this._uid = data.id\n\
     this._verticalCost = data.StraightCost\n\
     this._horizontalCost = data.StraightCost\n\
-    this._daigonalCost = data.DaigonalCost\n\
+    this._diagonalCost = data.DiagonalCost\n\
     this._free_ = true\n\
-    this.Daigonals = data.Daigonals\n\
+    this.Diagonals= data.Diagonals\n\
     this._Queue = []\n\
 }";
 
@@ -2003,7 +2003,7 @@ Phaser.Plugin.asyncPath.worker_getSoroundingNodes = "\nasyncWoker.prototype.getS
         }\n\
         SoroundingNodes.push(NodeGrid[Node.Y][Node.X + 1]);\n\
     }\n\
-    if (this.Daigonals) {\n\
+    if (this.Diagonals) {\n\
         if (Node.X === 0) {\n\
             NodeDownLeft = false;\n\
             NodeUpLeft = false;\n\
@@ -2022,25 +2022,25 @@ Phaser.Plugin.asyncPath.worker_getSoroundingNodes = "\nasyncWoker.prototype.getS
         }\n\
         if (NodeDownRight && NodeGrid[Node.Y + 1][Node.X + 1].Acceptable && !NodeGrid[Node.Y + 1][Node.X + 1].StartNode) {\n\
             if (NodeGrid[Node.Y + 1][Node.X + 1].Parent === null) {\n\
-                NodeGrid[Node.Y + 1][Node.X + 1].Gcost = Node.Gcost + this._daigonalCost;\n\
+                NodeGrid[Node.Y + 1][Node.X + 1].Gcost = Node.Gcost + this._diagonalCost;\n\
             }\n\
             SoroundingNodes.push(NodeGrid[Node.Y + 1][Node.X + 1]);\n\
         }\n\
         if (NodeDownLeft && NodeGrid[Node.Y + 1][Node.X - 1].Acceptable && !NodeGrid[Node.Y + 1][Node.X - 1].StartNode) {\n\
             if (NodeGrid[Node.Y + 1][Node.X - 1].Parent === null) {\n\
-                NodeGrid[Node.Y + 1][Node.X - 1].Gcost = Node.Gcost + this._daigonalCost;\n\
+                NodeGrid[Node.Y + 1][Node.X - 1].Gcost = Node.Gcost + this._diagonalCost;\n\
             }\n\
             SoroundingNodes.push(NodeGrid[Node.Y + 1][Node.X - 1]);\n\
         }\n\
         if (NodeUpLeft && NodeGrid[Node.Y - 1][Node.X - 1].Acceptable && !NodeGrid[Node.Y - 1][Node.X - 1].StartNode) {\n\
             if (NodeGrid[Node.Y - 1][Node.X - 1].Parent === null) {\n\
-                NodeGrid[Node.Y - 1][Node.X - 1].Gcost = Node.Gcost + this._daigonalCost;\n\
+                NodeGrid[Node.Y - 1][Node.X - 1].Gcost = Node.Gcost + this._diagonalCost;\n\
             }\n\
             SoroundingNodes.push(NodeGrid[Node.Y - 1][Node.X - 1]);\n\
         }\n\
         if (NodeUpRight && NodeGrid[Node.Y - 1][Node.X + 1].Acceptable && !NodeGrid[Node.Y - 1][Node.X + 1].StartNode) {\n\
             if (NodeGrid[Node.Y - 1][Node.X + 1].Parent === null) {\n\
-                NodeGrid[Node.Y - 1][Node.X + 1].Gcost = Node.Gcost + this._daigonalCost;\n\
+                NodeGrid[Node.Y - 1][Node.X + 1].Gcost = Node.Gcost + this._diagonalCost;\n\
             }\n\
             SoroundingNodes.push(NodeGrid[Node.Y - 1][Node.X + 1]);\n\
         }\n\
