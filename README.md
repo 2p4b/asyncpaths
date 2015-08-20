@@ -1,4 +1,4 @@
-# AsyncPathingFinding(1.0.0)
+# AsyncPathingFinding 1.0.0
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
 
 
