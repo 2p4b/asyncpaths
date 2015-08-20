@@ -2,7 +2,7 @@
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
 
 
-# | Quick sample |
+### | Quick sample |
 
 ```javascript
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
@@ -33,14 +33,14 @@ function create() {
 
 
 
-#Plugin Initialization
+####Plugin Initialization
 ```javascript
 
 asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
 
 ```
 
-#Block Configuration
+####Block Configuration
 
 ``` javascript
 Block = {
@@ -115,7 +115,7 @@ notfound: {Function}
 ```
 
 
-#Plugin Configurations
+##Plugin Configurations
 
 Setting the plugin with a map
 ```javascript
@@ -208,7 +208,7 @@ A good choice will be using a web Worker only if you have too many path
 finding calculations to be done instantly, else setting timers for numeber of calculations to be done in each Phaser Display frame would be much more efficient. The
 ``` newWorker() ``` method returns a new webworker instance. Webworkers are managed internally by the plugin;
 
-** Note **
+### Note
 If there are no web workers, all path finding calculations run on the main UI thread.
 The returned webworker instance is managed internally by the plugin
 
