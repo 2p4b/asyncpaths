@@ -1027,7 +1027,6 @@ Phaser.Plugin.asyncPath.prototype.asyncConfig = function(cords){
             _this[configuraion] = cords[configuraion];
         }
     });
-    console.log(this.Diagonals)
 }
 
 
