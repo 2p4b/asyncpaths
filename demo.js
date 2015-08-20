@@ -64,7 +64,7 @@ findpath = function(){
 		Origin: car,
 		Destination: game.input,
 		debugpath: true,
-		Daigonals: true,
+		Diagonals: true,
 		found: function (path){
 
 		},
