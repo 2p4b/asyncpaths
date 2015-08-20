@@ -1,4 +1,4 @@
-# AsyncPathingFinding(0.0.1)
+# AsyncPathingFinding(1.0.0)
 PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
 
 
@@ -14,9 +14,9 @@ function preload() {
 function create() {
  var asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
  var PointA = {x: 13, y: 14}; // works fine with Sprite, Point, or any object with x and y properties
- PointB = {x:22, y,44};
+ PointB = {x: 22, y: 44};
  Block = {
-      Origin: PonitA,
+      Origin: PointA,
       Destination: PointB,
       found: function(path){
               console.log(path);
@@ -48,7 +48,7 @@ Block = {
   Destination: {x:{number}, y:{number}},
   keepTrack: {boolean}, Optional
   trackBy: {string}, Optional
-  Daigonals: {boolean},  Optional
+  Diagonals: {boolean},  Optional
   debugpath: {boolean},  Optional
   Algorithm: {string},  Optional
   forcemain: {boolean},  Optional
@@ -70,16 +70,16 @@ keepTrack: {boolean}
 
 #
 The offset is Calculated on tracked blocks and property.
-If tracked property is greater than less than offset then new path is calculated from Origin to detination
+If tracked property is greater than or less than offset then new path is calculated from Origin to detination
 
 ``` javascript
 trackBy: {string} 'Origin' OR 'Destination'
 ``` 
 
 #
-Forces path Manager to set new Daigonal setting ofr this block
+Forces path Manager to set new Diagonal setting for this block
 ``` javascript
-Daigonals: {boolean}
+Diagonals: {boolean}
 ```
 
 #
@@ -115,7 +115,7 @@ notfound: {Function}
 ```
 
 
-#Plugin Congiurations
+#Plugin Configurations
 
 Setting the plugin with a map
 ```javascript
@@ -124,7 +124,7 @@ asyncPath.tileMap = map;
 ```
 
 
-Setting up Default watchers offset values in X anf Y directions that would trigger a pathfinding calculation on tracked blocks
+Setting up Default watchers offset values in X and Y directions that would trigger a pathfinding calculation on tracked blocks
 
 ```javascript
 asyncPath.xyOffset = {number}
@@ -140,7 +140,7 @@ Y offset trigger
 asyncPath.xOffset = {number}
 ```
 
-Setting up the returned path congiguration default pixel
+Setting up the returned path configuration default pixel
 ```javascript
 asyncPath.xOffset = {string} 'units' OR 'pixel'
 ```
@@ -152,7 +152,7 @@ asyncPath.algorithm = {string} 'Manhattan' OR 'Euclidean'
 ```
 
 
-Setting up the returned path congiguration (if the returned paths should point to the center of each tile or the edges) default true
+Setting up the return path configuration (if the return path should point to the center of each tile or the edges) default true
 ```javascript
 asyncPath.centerPaths = {boolean} true OR false 
 ```
@@ -190,7 +190,7 @@ asyncPath.nonWalkableTile = {number} OR {[number]}
 
 
 
-Setting Path Debuging cloro
+Setting Path Debuging color
 ```javascript
 asyncPath.debugColor = {HEX_NUMBER}
 ```
@@ -204,9 +204,9 @@ asyncPath.nonWalkableLayer = {string}
 
 
 #Creating a web worker for faster path calculations
-A good choice will be using a web Worker only if you have many too many path
-finding calculation to be done instantly, else setting timers for numeber of calculation to be done in each Phaser Display frame would be much more efficient. The
-``` newWorker() ``` method returns the webworker instance for each worker so you too can manage
+A good choice will be using a web Worker only if you have too many path
+finding calculations to be done instantly, else setting timers for numeber of calculations to be done in each Phaser Display frame would be much more efficient. The
+``` newWorker() ``` method returns the webworker instance for each worker so you too can manage the webworker
 
 
 ```javascript
@@ -218,9 +218,9 @@ Sets Algorithm for webworker
 asyncPath.webWorkerAlgorithm {string} 'Manhattan' OR 'Euclidean'
 ```
 
-Set the use of Daigonals in webWorker
+Set the use of Diagonals in webWorker
 ```javascript
-asyncPath.webWorkerDaigonals {boolean} true OR false 
+asyncPath.webWorkerDiagonals {boolean} true OR false 
 ```
 
 Set the cost of Vertical and Horizontal movement in webWorker
@@ -228,24 +228,11 @@ Set the cost of Vertical and Horizontal movement in webWorker
 asyncPath.webWorkerVerHorCost {number}
 ```
 
-Set the cost of Daigonal movement in webWorker
+Set the cost of Diagonal movement in webWorker
 ```javascript
-asyncPath.webWorkerDaigonalsCost {number}
+asyncPath.webWorkerDiagonalsCost {number}
 ```
 
 # Note
 If there are no web workers, all path finding calculations run on the main UI thread.
-The returned webworker instance is managed internaly by the plugin
-
-
-
-
-
-
-
-
-
-
-
-
-
+The returned webworker instance is managed internally by the plugin
