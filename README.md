@@ -206,7 +206,7 @@ asyncPath.nonWalkableLayer = {string}
 #Creating a web worker for faster path calculations
 A good choice will be using a web Worker only if you have too many path
 finding calculations to be done instantly, else setting timers for numeber of calculations to be done in each Phaser Display frame would be much more efficient. The
-``` newWorker() ``` method returns the webworker instance for each worker so you too can manage the webworker
+``` newWorker() ``` method returns the webworker instance for newly created webworker so you too can manage the webworker. Eash webWorker is managed internally by the plugin itself
 
 
 ```javascript
@@ -215,22 +215,22 @@ asyncPath.newWorker();
 
 Sets Algorithm for webworker
 ```javascript
-asyncPath.webWorkerAlgorithm {string} 'Manhattan' OR 'Euclidean'
+asyncPath.webWorkerAlgorithm = {string} 'Manhattan' OR 'Euclidean'
 ```
 
 Set the use of Diagonals in webWorker
 ```javascript
-asyncPath.webWorkerDiagonals {boolean} true OR false 
+asyncPath.webWorkerDiagonals = {boolean} true OR false 
 ```
 
 Set the cost of Vertical and Horizontal movement in webWorker
 ```javascript
-asyncPath.webWorkerVerHorCost {number}
+asyncPath.webWorkerVerHorCost = {number}
 ```
 
 Set the cost of Diagonal movement in webWorker
 ```javascript
-asyncPath.webWorkerDiagonalsCost {number}
+asyncPath.webWorkerDiagonalsCost = {number}
 ```
 
 # Note
