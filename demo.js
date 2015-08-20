@@ -1,4 +1,4 @@
-var game = new Phaser.Game(1150, 832, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(1150, 800, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
   game.load.tilemap('demoMapJSON', 'assets/gridChallenge.json', null, Phaser.Tilemap.TILED_JSON);
