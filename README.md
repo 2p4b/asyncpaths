@@ -208,7 +208,7 @@ A good choice will be using a web Worker only if you have too many path
 finding calculations to be done instantly, else setting timers for numeber of calculations to be done in each Phaser Display frame would be much more efficient. The
 ``` newWorker() ``` method returns a new webworker instance. Webworkers are managed internally by the plugin;
 
-# Note
+** Note **
 If there are no web workers, all path finding calculations run on the main UI thread.
 The returned webworker instance is managed internally by the plugin
 
