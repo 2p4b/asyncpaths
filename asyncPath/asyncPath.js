@@ -163,7 +163,7 @@ Phaser.Plugin.asyncPath = function (parent) {
      * @type {String}
      * @private
      */
-    this._version_ = "0.0.1";
+    this._version_ = "1.0.0";
 
 
 
