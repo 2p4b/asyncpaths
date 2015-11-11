@@ -109,7 +109,7 @@ found: {Function}
 ```
 
 #
-notfound function is fired each time a path is not found
+```notfound``` function is fired each time a path is not found
 ``` javascript
 notfound: {Function} 
 ```
