@@ -103,7 +103,7 @@ forcemain: {boolean}
 
 
 #
-found function is fired each time a path is found
+```found``` function is fired each time a path is found
 ``` javascript
 found: {Function} 
 ```
