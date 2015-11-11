@@ -1,5 +1,5 @@
-# AsyncPathingFinding 1.0.0
-PhaserJS PathFinding plugin with optional use of web worker configuration. Fast Easy to use
+# Async. Path Finding 1.0.0
+PhaserJS Path Finding plugin, with optional use of web worker configuration. Fast and Easy to use
 
 
 ### | Quick sample |
