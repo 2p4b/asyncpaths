@@ -205,7 +205,7 @@ asyncPath.nonWalkableLayer = {string}
 
 #Creating a web worker for faster path calculations
 A good choice will be using a web Worker only if you have too many path
-finding calculations to be done instantly, else setting timers for numeber of calculations to be done in each Phaser Display frame would be much more efficient. The
+finding calculations to be done instantly, else setting timers for number of calculations to be done in each Phaser Display frame would be much more efficient. The
 ``` newWorker() ``` method returns a new webworker instance. Webworkers are managed internally by the plugin;
 
 ### Note
