@@ -33,14 +33,14 @@ function create() {
 
 
 
-####Plugin Initialization
+#### Plugin Initialization
 ```javascript
 
 asyncPath = game.plugins.add(Phaser.Plugin.asyncPath);
 
 ```
 
-####Block Configuration
+#### Block Configuration
 
 ``` javascript
 Block = {
